@@ -24,7 +24,7 @@ class Dragon extends Piece {
   
   @Override
   ArrayList<Move> calculateLegalMoves(final Board board) {
-    return flyMoves(board, this);
+    return flightMoves(board, this);
   }
 }
 
@@ -36,5 +36,16 @@ class Wizard extends Piece {
   @Override
   ArrayList<Move> calculateLegalMoves(final Board board) {
     return diagonalMoves(board, this);
+  }
+}
+
+class Elf extends Piece {
+  Elf(final short pieceId, final Alliance pieceAlliance) {
+    super(pieceId, pieceAlliance);
+  }
+  
+  @Override
+  ArrayList<Move> calculateLegalMoves(final Board board) {
+    return straightMoves(board, this);
   }
 }

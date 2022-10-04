@@ -25,7 +25,7 @@ class AttackMove extends Move {
   }
 }
 
-ArrayList<Move> flyMoves(final Board board, final Piece pieceMoved) {
+ArrayList<Move> flightMoves(final Board board, final Piece pieceMoved) {
   final Coordinate[] CANDIDATE_MOVE_COORDINATES = {
                        new Coordinate((byte)  7, (byte)  2), new Coordinate((byte)  5, (byte)  6), new Coordinate((byte)  2, (byte)  8),
                        new Coordinate((byte) -2, (byte)  8), new Coordinate((byte) -5, (byte)  6), new Coordinate((byte) -7, (byte)  2),
@@ -51,13 +51,9 @@ ArrayList<Move> flyMoves(final Board board, final Piece pieceMoved) {
   return legalMoves;
 }
 
-ArrayList<Move> diagonalMoves(final Board board, final Piece pieceMoved) {
-  final Coordinate[] CANDIDATE_MOVE_VECTOR_COORDINATES = {
-                       new Coordinate((byte)  4, (byte) 0), new Coordinate((byte)  2, (byte)  4), new Coordinate((byte) -2, (byte)  4),
-                       new Coordinate((byte) -4, (byte) 0), new Coordinate((byte) -2, (byte) -4), new Coordinate((byte)  2, (byte) -4)
-                     };
+ArrayList<Move> surfaceMoves(final Board board, final Piece pieceMoved, final Coordinate[] vectorMove) {
   final ArrayList<Move> legalMoves = new ArrayList<Move>();
-  for(Coordinate candidateCoordinateOffset: CANDIDATE_MOVE_VECTOR_COORDINATES) {
+  for(Coordinate candidateCoordinateOffset: vectorMove) {
     Coordinate candidateDestinationCoordinate = new Coordinate((byte) (EMPTY_TILES_CACHE[pieceMoved.pieceId].tileCoordinate.x + candidateCoordinateOffset.x), (byte) (EMPTY_TILES_CACHE[pieceMoved.pieceId].tileCoordinate.y + candidateCoordinateOffset.y));
     while(coordinateToId(candidateDestinationCoordinate) != -1) {
       final Tile candidateDestinationTile = board.getTile(candidateDestinationCoordinate);
@@ -74,4 +70,20 @@ ArrayList<Move> diagonalMoves(final Board board, final Piece pieceMoved) {
     }
   }
   return legalMoves;
+}
+
+ArrayList<Move> diagonalMoves(final Board board, final Piece pieceMoved) {
+  final Coordinate[] diagonalVectorMoves = {
+                       new Coordinate((byte)  4, (byte) 0), new Coordinate((byte)  2, (byte)  4), new Coordinate((byte) -2, (byte)  4),
+                       new Coordinate((byte) -4, (byte) 0), new Coordinate((byte) -2, (byte) -4), new Coordinate((byte)  2, (byte) -4)
+                     };
+  return surfaceMoves(board, pieceMoved, diagonalVectorMoves);
+}
+
+ArrayList<Move> straightMoves(final Board board, final Piece pieceMoved) {
+  final Coordinate[] straightVectorMoves = {
+                       new Coordinate((byte)  3, (byte)  2), new Coordinate((byte) 0, (byte)  4), new Coordinate((byte) -3, (byte)  2),
+                       new Coordinate((byte) -3, (byte) -2), new Coordinate((byte) 0, (byte) -4), new Coordinate((byte)  3, (byte) -2)
+                     };
+  return surfaceMoves(board, pieceMoved, straightVectorMoves);
 }
