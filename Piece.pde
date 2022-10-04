@@ -18,35 +18,23 @@ abstract class Piece {
 }
 
 class Dragon extends Piece {
-  final Coordinate[] CANDIDATE_MOVE_COORDINATES = {
-                       new Coordinate((byte)  7, (byte)  2), new Coordinate((byte)  5, (byte)  6), new Coordinate((byte)  2, (byte)  8),
-                       new Coordinate((byte) -2, (byte)  8), new Coordinate((byte) -5, (byte)  6), new Coordinate((byte) -7, (byte)  2),
-                       new Coordinate((byte) -7, (byte) -2), new Coordinate((byte) -5, (byte) -6), new Coordinate((byte) -2, (byte) -8),
-                       new Coordinate((byte)  2, (byte) -8), new Coordinate((byte)  5, (byte) -6), new Coordinate((byte)  7, (byte) -2)
-                     };
-  
   Dragon(final short pieceId, final Alliance pieceAlliance) {
     super(pieceId, pieceAlliance);
   }
   
   @Override
   ArrayList<Move> calculateLegalMoves(final Board board) {
-    final ArrayList<Move> legalMoves = new ArrayList<Move>();
-    for(Coordinate currentCandidate: CANDIDATE_MOVE_COORDINATES) {
-      final Coordinate candidateDestinationCoordinate = new Coordinate((byte) (EMPTY_TILES_CACHE[this.pieceId].tileCoordinate.x + currentCandidate.x), (byte) (EMPTY_TILES_CACHE[this.pieceId].tileCoordinate.y + currentCandidate.y));
-      if(coordinateToId(candidateDestinationCoordinate) == -1)
-        continue;
-      Tile candidateDestinationTile = board.getTile(candidateDestinationCoordinate);
-      if(true) {//if(!candidateDestinationTile.isTileOccupied()) {
-        legalMoves.add(new MajorMove(board, this, candidateDestinationCoordinate));
-      } else {
-        final Piece pieceDestination = candidateDestinationTile.getPiece();
-        final Alliance pieceAlliance = pieceDestination.pieceAlliance;
-        if(this.pieceAlliance != pieceAlliance) {
-          legalMoves.add(new AttackMove(board, this, candidateDestinationCoordinate, pieceDestination));
-        }
-      }
-    }
-    return legalMoves;
+    return flyMoves(board, this);
+  }
+}
+
+class Wizard extends Piece {
+  Wizard(final short pieceId, final Alliance pieceAlliance) {
+    super(pieceId, pieceAlliance);
+  }
+  
+  @Override
+  ArrayList<Move> calculateLegalMoves(final Board board) {
+    return diagonalMoves(board, this);
   }
 }
