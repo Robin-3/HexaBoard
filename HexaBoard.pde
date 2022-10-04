@@ -14,8 +14,8 @@ void setup() {
   stroke(0);
   // noLoop();
   //printArray(EMPTY_TILES_CACHE); // Check valid coordinates
-  //show valid moves - elf piece
-  Elf moveTest = new Elf(coordinateToId(new Coordinate((byte) 0, (byte) 0)), Alliance.PA);
+  //show valid moves - doppelganger piece
+  Doppelganger moveTest = new Doppelganger(coordinateToId(new Coordinate((byte) 0, (byte) 0)), Alliance.PA);
   ArrayList<Move> dTestMove = moveTest.calculateLegalMoves(new Board());
   for(Move move: dTestMove) {
     println(move.destinationCoordinate);

@@ -49,3 +49,17 @@ class Elf extends Piece {
     return straightMoves(board, this);
   }
 }
+
+class Doppelganger extends Piece {
+  Doppelganger(final short pieceId, final Alliance pieceAlliance) {
+    super(pieceId, pieceAlliance);
+  }
+  
+  @Override
+  ArrayList<Move> calculateLegalMoves(final Board board) {
+    final ArrayList<Move> legalMoves = new ArrayList<Move>();
+    legalMoves.addAll(diagonalMoves(board, this));
+    legalMoves.addAll(straightMoves(board, this));
+    return legalMoves;
+  }
+}
