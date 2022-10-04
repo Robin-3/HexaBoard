@@ -35,7 +35,7 @@ class Wizard extends Piece {
   
   @Override
   ArrayList<Move> calculateLegalMoves(final Board board) {
-    return diagonalMoves(board, this);
+    return diagonalMoves(board, this, true);
   }
 }
 
@@ -46,7 +46,21 @@ class Elf extends Piece {
   
   @Override
   ArrayList<Move> calculateLegalMoves(final Board board) {
-    return straightMoves(board, this);
+    return straightMoves(board, this, true);
+  }
+}
+
+class Mimic extends Piece {
+  Mimic(final short pieceId, final Alliance pieceAlliance) {
+    super(pieceId, pieceAlliance);
+  }
+  
+  @Override
+  ArrayList<Move> calculateLegalMoves(final Board board) {
+    final ArrayList<Move> legalMoves = new ArrayList<Move>();
+    legalMoves.addAll(diagonalMoves(board, this, false));
+    legalMoves.addAll(straightMoves(board, this, false));
+    return legalMoves;
   }
 }
 
@@ -58,8 +72,8 @@ class Doppelganger extends Piece {
   @Override
   ArrayList<Move> calculateLegalMoves(final Board board) {
     final ArrayList<Move> legalMoves = new ArrayList<Move>();
-    legalMoves.addAll(diagonalMoves(board, this));
-    legalMoves.addAll(straightMoves(board, this));
+    legalMoves.addAll(diagonalMoves(board, this, true));
+    legalMoves.addAll(straightMoves(board, this, true));
     return legalMoves;
   }
 }

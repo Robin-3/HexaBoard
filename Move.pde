@@ -51,7 +51,7 @@ ArrayList<Move> flightMoves(final Board board, final Piece pieceMoved) {
   return legalMoves;
 }
 
-ArrayList<Move> surfaceMoves(final Board board, final Piece pieceMoved, final Coordinate[] vectorMove) {
+ArrayList<Move> surfaceMoves(final Board board, final Piece pieceMoved, final Coordinate[] vectorMove, final boolean infiniteMoves) {
   final ArrayList<Move> legalMoves = new ArrayList<Move>();
   for(Coordinate candidateCoordinateOffset: vectorMove) {
     Coordinate candidateDestinationCoordinate = new Coordinate((byte) (EMPTY_TILES_CACHE[pieceMoved.pieceId].tileCoordinate.x + candidateCoordinateOffset.x), (byte) (EMPTY_TILES_CACHE[pieceMoved.pieceId].tileCoordinate.y + candidateCoordinateOffset.y));
@@ -66,24 +66,26 @@ ArrayList<Move> surfaceMoves(final Board board, final Piece pieceMoved, final Co
           legalMoves.add(new AttackMove(board, pieceMoved, candidateDestinationCoordinate, pieceDestination));
         }
       }
+      if(!infiniteMoves)
+        break;
       candidateDestinationCoordinate = new Coordinate((byte) (candidateDestinationCoordinate.x + candidateCoordinateOffset.x), (byte) (candidateDestinationCoordinate.y + candidateCoordinateOffset.y));
     }
   }
   return legalMoves;
 }
 
-ArrayList<Move> diagonalMoves(final Board board, final Piece pieceMoved) {
+ArrayList<Move> diagonalMoves(final Board board, final Piece pieceMoved, final boolean infiniteMoves) {
   final Coordinate[] diagonalVectorMoves = {
                        new Coordinate((byte)  4, (byte) 0), new Coordinate((byte)  2, (byte)  4), new Coordinate((byte) -2, (byte)  4),
                        new Coordinate((byte) -4, (byte) 0), new Coordinate((byte) -2, (byte) -4), new Coordinate((byte)  2, (byte) -4)
                      };
-  return surfaceMoves(board, pieceMoved, diagonalVectorMoves);
+  return surfaceMoves(board, pieceMoved, diagonalVectorMoves, infiniteMoves);
 }
 
-ArrayList<Move> straightMoves(final Board board, final Piece pieceMoved) {
+ArrayList<Move> straightMoves(final Board board, final Piece pieceMoved, final boolean infiniteMoves) {
   final Coordinate[] straightVectorMoves = {
                        new Coordinate((byte)  3, (byte)  2), new Coordinate((byte) 0, (byte)  4), new Coordinate((byte) -3, (byte)  2),
                        new Coordinate((byte) -3, (byte) -2), new Coordinate((byte) 0, (byte) -4), new Coordinate((byte)  3, (byte) -2)
                      };
-  return surfaceMoves(board, pieceMoved, straightVectorMoves);
+  return surfaceMoves(board, pieceMoved, straightVectorMoves, infiniteMoves);
 }
