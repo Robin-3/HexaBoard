@@ -21,17 +21,8 @@ abstract class Tile {
     this.tileCoordinate = tileCoordinate;
   }
   
-  Tile createTile(final short tileId, final Piece piece) {
-    return piece == null? EMPTY_TILES_CACHE[tileId]: new OccupiedTile(tileId, EMPTY_TILES_CACHE[tileId].tileCoordinate, piece);
-  }
-  
   abstract boolean isTileOccupied();
   abstract Piece getPiece();
-
-  @Override
-  String toString() {
-    return ""+tileId+":"+tileCoordinate;
-  }
 }
 
 class EmptyTile extends Tile {
@@ -67,9 +58,32 @@ class OccupiedTile extends Tile {
   Piece getPiece() {
     return pieceOnTile;
   }
+
+  @Override
+  String toString() {
+    return pieceOnTile.symbol();
+  }
 }
 
 class Board {
+  final Tile[] gameBoard;
+  Alliance allianceMovement;
+  
+  Board(final Alliance allianceMovement) {
+    this.gameBoard = new Tile[EMPTY_TILES_CACHE.length];
+    for(int i = 0; i < this.gameBoard.length; i++) {
+      this.gameBoard[i] = new EmptyTile(EMPTY_TILES_CACHE[i].tileId, EMPTY_TILES_CACHE[i].tileCoordinate);
+    }
+    this.allianceMovement = allianceMovement;
+  }
+  
+  Board(final Alliance allianceMovement, final Piece[] pieces) {
+    this(allianceMovement);
+    for(Piece piece: pieces) {
+      this.gameBoard[piece.pieceId] = new OccupiedTile(piece.pieceId, EMPTY_TILES_CACHE[piece.pieceId].tileCoordinate, piece);
+    }
+  }
+  
   Tile getTile(final Coordinate tileCoordinate) {
     return null;
   }

@@ -1,4 +1,3 @@
-// #ADD8E6:(173,216,230), #F39DB2:(243,157,178), #94C191:(148,193,145)
 enum Alliance {
   NO {
     @Override Coordinate getMoveDirection() {return new Coordinate((byte) -3, (byte) -2);}
@@ -39,6 +38,7 @@ abstract class Piece {
   }
   
   abstract ArrayList<Move> calculateLegalMoves(final Board board);
+  abstract String symbol();
 }
 
 class Assasin extends Piece {
@@ -49,6 +49,11 @@ class Assasin extends Piece {
   @Override
   ArrayList<Move> calculateLegalMoves(final Board board) {
     return fixedMoves(board, this, false);
+  }
+  
+  @Override
+  String symbol() {
+    return "A";
   }
 }
 
@@ -61,6 +66,11 @@ class Dragon extends Piece {
   ArrayList<Move> calculateLegalMoves(final Board board) {
     return flightMoves(board, this);
   }
+
+  @Override
+  String symbol() {
+    return "D";
+  }
 }
 
 class Wizard extends Piece {
@@ -72,6 +82,11 @@ class Wizard extends Piece {
   ArrayList<Move> calculateLegalMoves(final Board board) {
     return diagonalMoves(board, this, true);
   }
+
+  @Override
+  String symbol() {
+    return "W";
+  }
 }
 
 class Elf extends Piece {
@@ -82,6 +97,11 @@ class Elf extends Piece {
   @Override
   ArrayList<Move> calculateLegalMoves(final Board board) {
     return straightMoves(board, this, true);
+  }
+
+  @Override
+  String symbol() {
+    return "E";
   }
 }
 
@@ -97,10 +117,15 @@ class Mimic extends Piece {
     legalMoves.addAll(straightMoves(board, this, false));
     return legalMoves;
   }
+
+  @Override
+  String symbol() {
+    return "M";
+  }
 }
 
-class Doppelganger extends Piece {
-  Doppelganger(final short pieceId, final Alliance pieceAlliance) {
+class Ghost extends Piece {
+  Ghost(final short pieceId, final Alliance pieceAlliance) {
     super(pieceId, pieceAlliance);
   }
   
@@ -110,5 +135,10 @@ class Doppelganger extends Piece {
     legalMoves.addAll(diagonalMoves(board, this, true));
     legalMoves.addAll(straightMoves(board, this, true));
     return legalMoves;
+  }
+
+  @Override
+  String symbol() {
+    return "G";
   }
 }
