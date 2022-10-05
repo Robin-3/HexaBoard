@@ -1,4 +1,4 @@
-class Coordinate {
+static class Coordinate {
   final byte x, y;
   
   Coordinate(final byte x, final byte y) {

@@ -1,8 +1,32 @@
 // #ADD8E6:(173,216,230), #F39DB2:(243,157,178), #94C191:(148,193,145)
 enum Alliance {
-  PA,
-  RE,
-  CI
+  NO {
+    @Override Coordinate getMoveDirection() {return new Coordinate((byte) -3, (byte) -2);}
+    @Override Coordinate[] getAttackDirection() {return new Coordinate[] {new Coordinate((byte) -4, (byte)  0), new Coordinate((byte) -2, (byte) -4)};}
+  },
+  PA {
+    @Override Coordinate getMoveDirection() {return new Coordinate((byte)  0, (byte) -4);}
+    @Override Coordinate[] getAttackDirection() {return new Coordinate[] {new Coordinate((byte) -2, (byte) -4), new Coordinate((byte)  2, (byte) -4)};}
+  },
+  RE {
+    @Override Coordinate getMoveDirection() {return new Coordinate((byte)  3, (byte) -2);}
+    @Override Coordinate[] getAttackDirection() {return new Coordinate[] {new Coordinate((byte)  2, (byte) -4), new Coordinate((byte)  4, (byte)  0)};}
+  },
+  CI {
+    @Override Coordinate getMoveDirection() {return new Coordinate((byte)  3, (byte)  2);}
+    @Override Coordinate[] getAttackDirection() {return new Coordinate[] {new Coordinate((byte)  4, (byte)  0), new Coordinate((byte)  2, (byte)  4)};}
+  },
+  VO {
+    @Override Coordinate getMoveDirection() {return new Coordinate((byte)  0, (byte)  4);}
+    @Override Coordinate[] getAttackDirection() {return new Coordinate[] {new Coordinate((byte)  2, (byte)  4), new Coordinate((byte) -2, (byte)  4)};}
+  },
+  MU {
+    @Override Coordinate getMoveDirection() {return new Coordinate((byte) -3, (byte)  2);}
+    @Override Coordinate[] getAttackDirection() {return new Coordinate[] {new Coordinate((byte) -2, (byte) 4), new Coordinate((byte) -4, (byte) 0)};}
+  };
+  
+  abstract Coordinate getMoveDirection();
+  abstract Coordinate[] getAttackDirection();
 }
 
 abstract class Piece {
@@ -15,6 +39,17 @@ abstract class Piece {
   }
   
   abstract ArrayList<Move> calculateLegalMoves(final Board board);
+}
+
+class Assasin extends Piece {
+  Assasin(final short pieceId, final Alliance pieceAlliance) {
+    super(pieceId, pieceAlliance);
+  }
+  
+  @Override
+  ArrayList<Move> calculateLegalMoves(final Board board) {
+    return fixedMoves(board, this, false);
+  }
 }
 
 class Dragon extends Piece {

@@ -74,6 +74,14 @@ ArrayList<Move> surfaceMoves(final Board board, final Piece pieceMoved, final Co
   return legalMoves;
 }
 
+ArrayList<Move> fixedMoves(final Board board, final Piece pieceMoved, final boolean infiniteMoves) {
+  final Coordinate[] fixedMoves = new Coordinate[3];
+                     fixedMoves[0] = pieceMoved.pieceAlliance.getMoveDirection();
+                     fixedMoves[1] = pieceMoved.pieceAlliance.getAttackDirection()[0];
+                     fixedMoves[2] = pieceMoved.pieceAlliance.getAttackDirection()[1];
+  return surfaceMoves(board, pieceMoved, fixedMoves, infiniteMoves);
+}
+
 ArrayList<Move> diagonalMoves(final Board board, final Piece pieceMoved, final boolean infiniteMoves) {
   final Coordinate[] diagonalVectorMoves = {
                        new Coordinate((byte)  4, (byte) 0), new Coordinate((byte)  2, (byte)  4), new Coordinate((byte) -2, (byte)  4),

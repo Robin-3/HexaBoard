@@ -14,8 +14,8 @@ void setup() {
   stroke(0);
   // noLoop();
   //printArray(EMPTY_TILES_CACHE); // Check valid coordinates
-  //show valid moves - mimic piece
-  Mimic moveTest = new Mimic(coordinateToId(new Coordinate((byte) 0, (byte) 0)), Alliance.PA);
+  //show valid moves - assasin piece
+  Assasin moveTest = new Assasin(coordinateToId(new Coordinate((byte) 0, (byte) 0)), Alliance.PA); //Alliance: NO, PA, RE, CI, VO, MU
   ArrayList<Move> dTestMove = moveTest.calculateLegalMoves(new Board());
   for(Move move: dTestMove) {
     println(move.destinationCoordinate);
@@ -53,8 +53,8 @@ void draw() {
       //else fill(col_fill[(i+j*boardTiles.length+1) % 3]);
       beginShape();
       final float collisionHeight = h*sin(60*PI/180.0);
-      final boolean boardTileRow = mouseY > h*(offsetW*(2-sqrt(3))/2.0 + j)+(h-collisionHeight)/2 && mouseY < h*(offsetW*(2-sqrt(3))/2.0 + j)+(h+collisionHeight)/2,
-                    boardTileCol = mouseX > w*(abs(offsetW)/2.0 + i) && mouseX < w*(abs(offsetW)/2.0 + i + 1);
+      final boolean boardTileRow = mouseY >= h*(offsetW*(2-sqrt(3))/2.0 + j)+(h-collisionHeight)/2 && mouseY < h*(offsetW*(2-sqrt(3))/2.0 + j)+(h+collisionHeight)/2,
+                    boardTileCol = mouseX >= w*(abs(offsetW)/2.0 + i) && mouseX < w*(abs(offsetW)/2.0 + i + 1);
       // Draw one tile
       if(!boardTiles[j][i] && !(boardTileRow && boardTileCol))
         continue;
