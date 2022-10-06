@@ -67,28 +67,38 @@ class OccupiedTile extends Tile {
 
 class Board {
   final Tile[] gameBoard;
-  Alliance allianceMovement;
+  final Alliance[] alliancePieces;
+  byte allianceMovement;
   
-  Board(final Alliance allianceMovement) {
+  Board(final ArrayList<Piece> pieces) {
     this.gameBoard = new Tile[EMPTY_TILES_CACHE.length];
     for(int i = 0; i < this.gameBoard.length; i++) {
       this.gameBoard[i] = new EmptyTile(EMPTY_TILES_CACHE[i].tileId, EMPTY_TILES_CACHE[i].tileCoordinate);
     }
-    this.allianceMovement = allianceMovement;
-  }
-  
-  Board(final Alliance allianceMovement, final Piece[] pieces) {
-    this(allianceMovement);
+    this.allianceMovement = 0;
+    ArrayList<Alliance> getAlliance = new ArrayList<Alliance>();
     for(Piece piece: pieces) {
       this.gameBoard[piece.pieceId] = new OccupiedTile(piece.pieceId, EMPTY_TILES_CACHE[piece.pieceId].tileCoordinate, piece);
+      boolean exist = false;
+      for(Alliance a: getAlliance) {
+        if(a == piece.pieceAlliance) {
+          exist = true;
+          break;
+        }
+      }
+      if(!exist)
+        getAlliance.add(piece.pieceAlliance);
     }
+    Alliance[] alliances = new Alliance[getAlliance.size()];
+    alliances = getAlliance.toArray(alliances);
+    this.alliancePieces = alliances;
   }
   
   Tile getTile(final Coordinate tileCoordinate) {
-    return null;
+    return gameBoard[coordinateToId(tileCoordinate)];
   }
   
-  Tile getTile(final short tileCoordinate) {
-    return null;
+  Alliance getAllianceMovement() {
+    return alliancePieces[allianceMovement];
   }
 }

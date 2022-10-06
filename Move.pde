@@ -38,7 +38,7 @@ ArrayList<Move> flightMoves(final Board board, final Piece pieceMoved) {
     if(coordinateToId(candidateDestinationCoordinate) == -1)
       continue;
     final Tile candidateDestinationTile = board.getTile(candidateDestinationCoordinate);
-    if(true || !candidateDestinationTile.isTileOccupied()) {
+    if(!candidateDestinationTile.isTileOccupied()) {
       legalMoves.add(new MajorMove(board, pieceMoved, candidateDestinationCoordinate));
     } else {
       final Piece pieceDestination = candidateDestinationTile.getPiece();
@@ -57,7 +57,7 @@ ArrayList<Move> surfaceMoves(final Board board, final Piece pieceMoved, final Co
     Coordinate candidateDestinationCoordinate = new Coordinate((byte) (EMPTY_TILES_CACHE[pieceMoved.pieceId].tileCoordinate.x + candidateCoordinateOffset.x), (byte) (EMPTY_TILES_CACHE[pieceMoved.pieceId].tileCoordinate.y + candidateCoordinateOffset.y));
     while(coordinateToId(candidateDestinationCoordinate) != -1) {
       final Tile candidateDestinationTile = board.getTile(candidateDestinationCoordinate);
-      if(true || !candidateDestinationTile.isTileOccupied()) {
+      if(!candidateDestinationTile.isTileOccupied()) {
         legalMoves.add(new MajorMove(board, pieceMoved, candidateDestinationCoordinate));
       } else {
         final Piece pieceDestination = candidateDestinationTile.getPiece();
