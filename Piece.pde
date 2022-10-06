@@ -1,113 +1,110 @@
 enum Alliance {
-  NO {
+  NO((byte) 0) {
     @Override Coordinate getMoveDirection() {return new Coordinate((byte) -3, (byte) -2);}
     @Override Coordinate[] getAttackDirection() {return new Coordinate[] {new Coordinate((byte) -4, (byte)  0), new Coordinate((byte) -2, (byte) -4)};}
   },
-  PA {
+  PA((byte) 1) {
     @Override Coordinate getMoveDirection() {return new Coordinate((byte)  0, (byte) -4);}
     @Override Coordinate[] getAttackDirection() {return new Coordinate[] {new Coordinate((byte) -2, (byte) -4), new Coordinate((byte)  2, (byte) -4)};}
   },
-  RE {
+  RE((byte) 2) {
     @Override Coordinate getMoveDirection() {return new Coordinate((byte)  3, (byte) -2);}
     @Override Coordinate[] getAttackDirection() {return new Coordinate[] {new Coordinate((byte)  2, (byte) -4), new Coordinate((byte)  4, (byte)  0)};}
   },
-  CI {
+  CI((byte) 3) {
     @Override Coordinate getMoveDirection() {return new Coordinate((byte)  3, (byte)  2);}
     @Override Coordinate[] getAttackDirection() {return new Coordinate[] {new Coordinate((byte)  4, (byte)  0), new Coordinate((byte)  2, (byte)  4)};}
   },
-  VO {
+  VO((byte) 4) {
     @Override Coordinate getMoveDirection() {return new Coordinate((byte)  0, (byte)  4);}
     @Override Coordinate[] getAttackDirection() {return new Coordinate[] {new Coordinate((byte)  2, (byte)  4), new Coordinate((byte) -2, (byte)  4)};}
   },
-  MU {
+  MU((byte) 5) {
     @Override Coordinate getMoveDirection() {return new Coordinate((byte) -3, (byte)  2);}
     @Override Coordinate[] getAttackDirection() {return new Coordinate[] {new Coordinate((byte) -2, (byte) 4), new Coordinate((byte) -4, (byte) 0)};}
   };
   
+  byte allianceName;
+  Alliance(final byte allianceName) {this.allianceName = allianceName;}
+  @Override String toString() {return ""+this.allianceName;}
   abstract Coordinate getMoveDirection();
   abstract Coordinate[] getAttackDirection();
+}
+
+enum PieceType {
+  ASSASIN('A'),
+  DRAGON('D'),
+  WIZARD('W'),
+  ELF('E'),
+  MIMIC('M'),
+  GHOST('G');
+  
+  char pieceName;
+  PieceType(final char pieceName) {this.pieceName = pieceName;}
+  @Override String toString() {return ""+this.pieceName;}
 }
 
 abstract class Piece {
   final short pieceId;
   final Alliance pieceAlliance;
+  final PieceType pieceType;
   
-  Piece(final short pieceId, final Alliance pieceAlliance) {
+  Piece(final short pieceId, final Alliance pieceAlliance, final PieceType pieceType) {
     this.pieceId = pieceId;
     this.pieceAlliance = pieceAlliance;
+    this.pieceType = pieceType;
   }
   
   abstract ArrayList<Move> calculateLegalMoves(final Board board);
-  abstract String symbol();
 }
 
 class Assasin extends Piece {
   Assasin(final short pieceId, final Alliance pieceAlliance) {
-    super(pieceId, pieceAlliance);
+    super(pieceId, pieceAlliance, PieceType.ASSASIN);
   }
   
   @Override
   ArrayList<Move> calculateLegalMoves(final Board board) {
     return fixedMoves(board, this, false);
   }
-  
-  @Override
-  String symbol() {
-    return "A";
-  }
 }
 
 class Dragon extends Piece {
   Dragon(final short pieceId, final Alliance pieceAlliance) {
-    super(pieceId, pieceAlliance);
+    super(pieceId, pieceAlliance, PieceType.DRAGON);
   }
   
   @Override
   ArrayList<Move> calculateLegalMoves(final Board board) {
     return flightMoves(board, this);
   }
-
-  @Override
-  String symbol() {
-    return "D";
-  }
 }
 
 class Wizard extends Piece {
   Wizard(final short pieceId, final Alliance pieceAlliance) {
-    super(pieceId, pieceAlliance);
+    super(pieceId, pieceAlliance, PieceType.WIZARD);
   }
   
   @Override
   ArrayList<Move> calculateLegalMoves(final Board board) {
     return diagonalMoves(board, this, true);
   }
-
-  @Override
-  String symbol() {
-    return "W";
-  }
 }
 
 class Elf extends Piece {
   Elf(final short pieceId, final Alliance pieceAlliance) {
-    super(pieceId, pieceAlliance);
+    super(pieceId, pieceAlliance, PieceType.ELF);
   }
   
   @Override
   ArrayList<Move> calculateLegalMoves(final Board board) {
     return straightMoves(board, this, true);
   }
-
-  @Override
-  String symbol() {
-    return "E";
-  }
 }
 
 class Mimic extends Piece {
   Mimic(final short pieceId, final Alliance pieceAlliance) {
-    super(pieceId, pieceAlliance);
+    super(pieceId, pieceAlliance, PieceType.MIMIC);
   }
   
   @Override
@@ -117,16 +114,11 @@ class Mimic extends Piece {
     legalMoves.addAll(straightMoves(board, this, false));
     return legalMoves;
   }
-
-  @Override
-  String symbol() {
-    return "M";
-  }
 }
 
 class Ghost extends Piece {
   Ghost(final short pieceId, final Alliance pieceAlliance) {
-    super(pieceId, pieceAlliance);
+    super(pieceId, pieceAlliance, PieceType.GHOST);
   }
   
   @Override
@@ -135,10 +127,5 @@ class Ghost extends Piece {
     legalMoves.addAll(diagonalMoves(board, this, true));
     legalMoves.addAll(straightMoves(board, this, true));
     return legalMoves;
-  }
-
-  @Override
-  String symbol() {
-    return "G";
   }
 }

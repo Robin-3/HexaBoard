@@ -139,7 +139,7 @@ void drawPieces() {
       }
       endShape(CLOSE);
       fill(0);
-      text(tile.toString(), x, y);
+      text(tile.getPiece().pieceType.toString(), x, y);
     }
   }
 }

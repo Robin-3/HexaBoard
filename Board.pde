@@ -39,6 +39,11 @@ class EmptyTile extends Tile {
   Piece getPiece() {
     return null;
   }
+
+  @Override
+  String toString() {
+    return tileId+".-.-";
+  }
 }
 
 class OccupiedTile extends Tile {
@@ -58,10 +63,10 @@ class OccupiedTile extends Tile {
   Piece getPiece() {
     return pieceOnTile;
   }
-
+  
   @Override
   String toString() {
-    return pieceOnTile.symbol();
+    return tileId+"."+pieceOnTile.pieceType.toString()+"."+pieceOnTile.pieceAlliance.toString();
   }
 }
 
@@ -70,16 +75,16 @@ class Board {
   final Alliance[] alliancePieces;
   byte allianceMovement;
   
-  Board(final ArrayList<Piece> pieces) {
+  Board(final ArrayList<Piece> pieces, Alliance allianceTurn) {
     this.gameBoard = new Tile[EMPTY_TILES_CACHE.length];
     for(int i = 0; i < this.gameBoard.length; i++) {
       this.gameBoard[i] = new EmptyTile(EMPTY_TILES_CACHE[i].tileId, EMPTY_TILES_CACHE[i].tileCoordinate);
     }
-    this.allianceMovement = 0;
     ArrayList<Alliance> getAlliance = new ArrayList<Alliance>();
+    boolean exist;
     for(Piece piece: pieces) {
       this.gameBoard[piece.pieceId] = new OccupiedTile(piece.pieceId, EMPTY_TILES_CACHE[piece.pieceId].tileCoordinate, piece);
-      boolean exist = false;
+      exist = false;
       for(Alliance a: getAlliance) {
         if(a == piece.pieceAlliance) {
           exist = true;
@@ -92,13 +97,50 @@ class Board {
     Alliance[] alliances = new Alliance[getAlliance.size()];
     alliances = getAlliance.toArray(alliances);
     this.alliancePieces = alliances;
+    exist = false;
+    for(byte i = 0; i < alliancePieces.length; i++) {
+      if(alliancePieces[i] == allianceTurn) {
+        this.allianceMovement = i;
+        exist = true;
+        break;
+      }
+    }
+    if(!exist) throw new IllegalArgumentException("Piece alliance "+allianceTurn+" does not participate in this game.");
   }
   
   Tile getTile(final Coordinate tileCoordinate) {
-    return gameBoard[coordinateToId(tileCoordinate)];
+    return this.gameBoard[coordinateToId(tileCoordinate)];
   }
   
   Alliance getAllianceMovement() {
-    return alliancePieces[allianceMovement];
+    return this.alliancePieces[allianceMovement];
+  }
+  
+  ArrayList<Piece> getAlliancePieces(final Alliance pieceAlliance) {
+    final ArrayList<Piece> pieces = new ArrayList<Piece>();
+    for(Tile tile: gameBoard)
+      if(tile.isTileOccupied() && tile.getPiece().pieceAlliance == pieceAlliance)
+        pieces.add(tile.getPiece());
+    return pieces;
+  }
+  
+  ArrayList<Move> getAllMoves() {
+    final ArrayList<Move> moves = new ArrayList<Move>();
+    final ArrayList<Piece> getPieces = this.getAlliancePieces(this.getAllianceMovement());
+    for(Piece piece: getPieces) {
+      moves.addAll(piece.calculateLegalMoves(this));
+    }
+    return moves;
+  }
+  
+  @Override
+  String toString() {
+    ArrayList<String> boardNotation = new ArrayList<String>();
+    for(Tile tile: gameBoard) {
+      if(tile.isTileOccupied()) {
+        boardNotation.add(tile.toString());
+      }
+    }
+    return this.getAllianceMovement()+":"+String.join(",", boardNotation);
   }
 }
