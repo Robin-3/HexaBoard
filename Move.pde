@@ -8,11 +8,26 @@ abstract class Move {
     this.movedPiece = movedPiece;
     this.destinationCoordinate = destinationCoordinate;
   }
+  
+  abstract Board execute();
 }
 
 class MajorMove extends Move {
   MajorMove(final Board board, final Piece movedPiece, final Coordinate destinationCoordinate) {
     super(board, movedPiece, destinationCoordinate);
+  }
+  
+  @Override
+  Board execute() {
+    final ArrayList<Piece> pieces = new ArrayList<Piece>();
+    for(final Alliance alliance: this.board.alliancePieces) {
+      pieces.addAll(this.board.getAlliancePieces(alliance));
+    }
+    pieces.remove(this.movedPiece);
+    final Piece moved = codeToPiece(this.movedPiece.pieceType.toString().charAt(0), coordinateToId(this.destinationCoordinate), this.movedPiece.pieceAlliance);
+    pieces.add(moved);
+    final Alliance nextMovement = this.board.getNextAllianceMovement();
+    return new Board(pieces, nextMovement);
   }
 }
 
@@ -22,6 +37,25 @@ class AttackMove extends Move {
   AttackMove(final Board board, final Piece movedPiece, final Coordinate destinationCoordinate, final Piece attackedPiece) {
     super(board, movedPiece, destinationCoordinate);
     this.attackedPiece = attackedPiece;
+  }
+  
+  @Override
+  Board execute() {
+    final short startId = this.movedPiece.pieceId;
+    final short endId = coordinateToId(this.destinationCoordinate);
+    final ArrayList<Piece> pieces = new ArrayList<Piece>();
+    for(final Alliance alliance: this.board.alliancePieces) {
+      final ArrayList<Piece> piecesOfAlliance = this.board.getAlliancePieces(alliance);
+      for(final Piece piece: piecesOfAlliance) {
+        if(piece.pieceId == startId || piece.pieceId == endId)
+          continue;
+        pieces.add(piece);
+      }
+    }
+    final Piece moved = codeToPiece(this.movedPiece.pieceType.toString().charAt(0), coordinateToId(this.destinationCoordinate), this.movedPiece.pieceAlliance);
+    pieces.add(moved);
+    final Alliance nextMovement = this.board.getNextAllianceMovement();
+    return new Board(pieces, nextMovement);
   }
 }
 

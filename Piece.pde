@@ -37,7 +37,8 @@ enum PieceType {
   WIZARD('W'),
   ELF('E'),
   MIMIC('M'),
-  GHOST('G');
+  GHOST('G'),
+  DOPPELGANGER('Ä');
   
   char pieceName;
   PieceType(final char pieceName) {this.pieceName = pieceName;}
@@ -119,6 +120,25 @@ class Mimic extends Piece {
 class Ghost extends Piece {
   Ghost(final short pieceId, final Alliance pieceAlliance) {
     super(pieceId, pieceAlliance, PieceType.GHOST);
+  }
+  
+  Ghost(final short pieceId, final Alliance pieceAlliance, final PieceType pieceType) {
+    super(pieceId, pieceAlliance, pieceType);
+  }
+  
+  @Override
+  ArrayList<Move> calculateLegalMoves(final Board board) {
+    final ArrayList<Move> legalMoves = new ArrayList<Move>();
+    legalMoves.addAll(diagonalMoves(board, this, false));
+    legalMoves.addAll(straightMoves(board, this, false));
+    legalMoves.addAll(flightMoves(board, this));
+    return legalMoves;
+  }
+}
+
+class Doppelganger extends Ghost {
+  Doppelganger(final short pieceId, final Alliance pieceAlliance) {
+    super(pieceId, pieceAlliance, PieceType.DOPPELGANGER);
   }
   
   @Override

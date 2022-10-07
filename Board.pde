@@ -1,78 +1,7 @@
-static class Coordinate {
-  final byte x, y;
-  
-  Coordinate(final byte x, final byte y) {
-    this.x = x;
-    this.y = y;
-  }
-  
-  @Override
-  String toString() {
-    return "("+x+","+y+")";
-  }
-}
-
-abstract class Tile {
-  final short tileId; //unsigned byte is better
-  final Coordinate tileCoordinate;
-  
-  Tile(final short tileId, final Coordinate tileCoordinate) {
-    this.tileId = tileId;
-    this.tileCoordinate = tileCoordinate;
-  }
-  
-  abstract boolean isTileOccupied();
-  abstract Piece getPiece();
-}
-
-class EmptyTile extends Tile {
-  EmptyTile(final short tileId, final Coordinate tileCoordinate) {
-    super(tileId, tileCoordinate);
-  }
-  
-  @Override
-  boolean isTileOccupied() {
-    return false;
-  }
-  
-  @Override
-  Piece getPiece() {
-    return null;
-  }
-
-  @Override
-  String toString() {
-    return tileId+".-.-";
-  }
-}
-
-class OccupiedTile extends Tile {
-  final Piece pieceOnTile;
-  
-  OccupiedTile(final short tileId, final Coordinate tileCoordinate, final Piece pieceOnTile) {
-    super(tileId, tileCoordinate);
-    this.pieceOnTile = pieceOnTile;
-  }
-  
-  @Override
-  boolean isTileOccupied() {
-    return true;
-  }
-  
-  @Override
-  Piece getPiece() {
-    return pieceOnTile;
-  }
-  
-  @Override
-  String toString() {
-    return tileId+"."+pieceOnTile.pieceType.toString()+"."+pieceOnTile.pieceAlliance.toString();
-  }
-}
-
 class Board {
   final Tile[] gameBoard;
   final Alliance[] alliancePieces;
+  final Player[] players;
   byte allianceMovement;
   
   Board(final ArrayList<Piece> pieces, Alliance allianceTurn) {
@@ -106,6 +35,10 @@ class Board {
       }
     }
     if(!exist) throw new IllegalArgumentException("Piece alliance "+allianceTurn+" does not participate in this game.");
+    players = new Player[alliances.length];
+    for(byte i = 0; i < players.length; i++) {
+      players[i] = new Player(this, this.alliancePieces[i], this.getAlliancePieces(this.alliancePieces[i]));
+    }
   }
   
   Tile getTile(final Coordinate tileCoordinate) {
@@ -113,7 +46,16 @@ class Board {
   }
   
   Alliance getAllianceMovement() {
-    return this.alliancePieces[allianceMovement];
+    return this.alliancePieces[this.allianceMovement];
+  }
+  
+  Alliance getNextAllianceMovement() {
+    final byte allianceNextMovement = (byte) ((this.allianceMovement+1)%this.alliancePieces.length);
+    return this.alliancePieces[allianceNextMovement];
+  }
+  
+  Player getPlayerMovement() {
+    return this.players[allianceMovement];
   }
   
   ArrayList<Piece> getAlliancePieces(final Alliance pieceAlliance) {
@@ -124,13 +66,12 @@ class Board {
     return pieces;
   }
   
-  ArrayList<Move> getAllMoves() {
-    final ArrayList<Move> moves = new ArrayList<Move>();
-    final ArrayList<Piece> getPieces = this.getAlliancePieces(this.getAllianceMovement());
-    for(Piece piece: getPieces) {
-      moves.addAll(piece.calculateLegalMoves(this));
-    }
-    return moves;
+  ArrayList<Move> getValidMoves() {
+    return this.getAllMoves(this.getPlayerMovement());
+  }
+  
+  ArrayList<Move> getAllMoves(final Player player) {
+    return player.getAllMoves();
   }
   
   @Override
