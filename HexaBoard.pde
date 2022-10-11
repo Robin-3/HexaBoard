@@ -5,7 +5,6 @@ short selectedTile = -1;
 final EmptyTile[] EMPTY_TILES_CACHE = createAllPossibleEmptyTiles();
 Board standardBoard = formation2players();
 ArrayList<Move> moves = standardBoard.getActualAllMoves();
-//ArrayList<Move> moves = standardBoard.getActualLegalMoves();
 PImage boardImage;
 PGraphics pieceText;
 final byte iSize = SIZE*2-1;

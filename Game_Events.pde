@@ -31,6 +31,21 @@ void selectTile() {
   }
 }
 
+void generateRandomMove() {
+  int randomIndexMove = floor(random(moves.size()));
+  Move move = moves.get(randomIndexMove);
+  while(move.getClass().getSimpleName().equals("ProtectMove")) {
+    randomIndexMove = floor(random(moves.size()));
+    move = moves.get(randomIndexMove);
+  }
+  final Coordinate cursorDestination = move.destinationCoordinate;
+  standardBoard = move.execute();
+  moves = standardBoard.getActualAllMoves();
+  selectedTile = -1;
+  cursorSelection = coordinateToId(cursorDestination);
+  redraw();
+}
+
 void keyPressed() {
   final Coordinate actualCoordinate = idToCoordinate(cursorSelection);
   byte x = 0, y = 0;
@@ -46,6 +61,8 @@ void keyPressed() {
     x = 2;
   } else if(keyCode == ENTER) {
     selectTile();
+  } else if(key == 'r') {
+    generateRandomMove();
   }
   final short checkTile = coordinateToId(new Coordinate((byte) (actualCoordinate.x+x), (byte) (actualCoordinate.y+y)));
   if(checkTile != -1) {
