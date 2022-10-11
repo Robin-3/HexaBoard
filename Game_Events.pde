@@ -19,7 +19,7 @@ void selectTile() {
       if(endId == cursorSelection && startId == selectedTile) {
         standardBoard = move.execute();
         moveIsExcute = true;
-        moves = standardBoard.getValidMoves();
+        moves = standardBoard.getActualAllMoves();
         break;
       }
     }

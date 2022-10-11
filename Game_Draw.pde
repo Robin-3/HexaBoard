@@ -1,8 +1,8 @@
 PImage drawBoard() {
   final PGraphics pg = createGraphics(width, height);
   pg.beginDraw();
-  pg.background(255);
-  pg.stroke(250, 248, 255); // #FAF8FF
+  pg.background(boardColors.get("tilesFill"));
+  pg.stroke(boardColors.get("tilesStroke"));
   pg.noFill();
   for(byte i = 0; i < iSize; i++) {
     final byte offsetW = (byte) (SIZE-1-i),
@@ -20,13 +20,13 @@ PImage drawBoard() {
       pg.endShape(CLOSE);
     }
   }
-  pg.noStroke();
-  pg.fill(0);
+  pg.fill(boardColors.get("gameBackground"));
+  pg.stroke(boardColors.get("gameStroke"));
   pg.beginShape();
-  pg.vertex(width, 0);
+  pg.vertex(width-1, 0);
   pg.vertex(0, 0);
-  pg.vertex(0, height);
-  pg.vertex(width, height);
+  pg.vertex(0, height-1);
+  pg.vertex(width-1, height-1);
   for (byte k = 0; k <= edges; k++) {
     final float theta = 2.0*PI*k/edges,
                 x = width*(cos(theta)/2+0.5),
@@ -39,8 +39,10 @@ PImage drawBoard() {
 }
 
 void drawPieces() {
-  noStroke();
   short counter = -1;
+  pieceText.beginDraw();
+  pieceText.clear();
+  pieceText.textAlign(CENTER, CENTER);
   for(byte i = 0; i < iSize; i++) {
     final byte offsetW = (byte) (SIZE-1-i),
                jSize = (byte) (iSize-abs(offsetW));
@@ -51,12 +53,8 @@ void drawPieces() {
       if(!tile.isTileOccupied())
         continue;
       final Alliance pieceAlliance = tile.getPiece().pieceAlliance;
-      if(pieceAlliance == Alliance.PA)
-        fill(173,216,230); // #ADD8E6
-      else if (pieceAlliance == Alliance.CI)
-        fill(243,157,178); // #F39DB2
-      else
-        fill(148,193,145); // #94C191
+      fill(boardColors.get("piece"+pieceAlliance+"Fill"));
+      stroke(boardColors.get("piece"+pieceAlliance+"Stroke"));
       beginShape();
       final float x = w*(abs(offsetW)/2.0 + j + 0.5);
       for (byte k = 0; k < edges; k++) {
@@ -66,21 +64,24 @@ void drawPieces() {
         vertex(xVertex, yVertex);
       }
       endShape(CLOSE);
-      fill(0);
-      text(tile.getPiece().pieceType.toString(), x, y);
+      pieceText.fill(boardColors.get("piece"+pieceAlliance+"Text"));
+      pieceText.text(tile.getPiece().pieceType.toString(), x, y);
     }
   }
+  pieceText.endDraw();
 }
 
 void drawMoves() {
   ArrayList<Short> pieceCandidateMoves = new ArrayList<Short>();
+  HashMap<Short, String> typeOfMove = new HashMap<Short, String>();
   for(Move move: moves) {
     final short startId = move.movedPiece.pieceId;
-    if(startId == selectedTile)
-    pieceCandidateMoves.add(coordinateToId(move.destinationCoordinate));
+    if(startId == selectedTile) {
+      final short destinationCoordinate = coordinateToId(move.destinationCoordinate);
+      pieceCandidateMoves.add(destinationCoordinate);
+      typeOfMove.put(destinationCoordinate, move.getClass().getSimpleName());
+    }
   }
-  noStroke();
-  fill(255, 255, 0, 200);
   short counter = -1;
   for(byte i = 0; i < iSize; i++) {
     final byte offsetW = (byte) (SIZE-1-i),
@@ -88,7 +89,13 @@ void drawMoves() {
     final float y = h*(0.5*(2-sqrt(3))*offsetW + i + 0.5);
     for(byte j = 0; j < jSize; j++) {
       counter++;
-      if(!pieceCandidateMoves.contains(counter))
+      if(pieceCandidateMoves.contains(counter)) {
+        stroke(boardColors.get(typeOfMove.get(counter)+"Stroke"));
+        fill(boardColors.get(typeOfMove.get(counter)+"Fill"));
+      } else if(selectedTile != -1 && counter == selectedTile) {
+        stroke(boardColors.get("selectPieceStroke"));
+        fill(boardColors.get("selectPieceFill"));
+      } else
         continue;
       beginShape();
       final float x = w*(abs(offsetW)/2.0 + j + 0.5);
@@ -104,7 +111,6 @@ void drawMoves() {
 }
 
 void drawSelection() {
-  noFill();
   short counter = -1;
   for(byte i = 0; i < iSize; i++) {
     final byte offsetW = (byte) (SIZE-1-i),
@@ -119,12 +125,13 @@ void drawSelection() {
       if(counter != cursorSelection)
         continue;
       final Tile tile = standardBoard.gameBoard[counter];
-      stroke(126, 0, 0); // #7E0000
+      fill(boardColors.get("selectorFill"));
+      stroke(boardColors.get("selectorStroke"));
       if(tile.isTileOccupied()) {
         final Alliance pieceAlliance = tile.getPiece().pieceAlliance;
         if(pieceAlliance == standardBoard.getAllianceMovement()) {
-          strokeWeight(1.5);
-          stroke(162, 0, 169); // #A200A9
+          fill(boardColors.get("alianceTurnFill"));
+          stroke(boardColors.get("alianceTurnStroke"));
         }
       }
       final float x = w*(abs(offsetW)/2.0 + j);
@@ -136,7 +143,6 @@ void drawSelection() {
         vertex(xVertex, yVertex);
       }
       endShape(CLOSE);
-      strokeWeight(1);
     }
   }
 }

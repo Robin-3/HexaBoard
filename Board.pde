@@ -66,12 +66,20 @@ class Board {
     return pieces;
   }
   
-  ArrayList<Move> getValidMoves() {
-    return this.getAllMoves(this.getPlayerMovement());
+  ArrayList<Move> getActualAllMoves() {
+    return this.getPlayerAllMoves(this.getPlayerMovement());
   }
   
-  ArrayList<Move> getAllMoves(final Player player) {
+  ArrayList<Move> getPlayerAllMoves(final Player player) {
     return player.getAllMoves();
+  }
+  
+  ArrayList<Move> getActualLegalMoves() {
+    return this.getLegalMoves(this.getPlayerMovement());
+  }
+  
+  ArrayList<Move> getLegalMoves(final Player player) {
+    return player.getLegalMoves();
   }
   
   @Override

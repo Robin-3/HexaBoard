@@ -19,6 +19,8 @@ class MajorMove extends Move {
   
   @Override
   Board execute() {
+    if(!this.board.getActualLegalMoves().contains(this))
+      return this.board;
     final ArrayList<Piece> pieces = new ArrayList<Piece>();
     for(final Alliance alliance: this.board.alliancePieces) {
       pieces.addAll(this.board.getAlliancePieces(alliance));
@@ -28,6 +30,19 @@ class MajorMove extends Move {
     pieces.add(moved);
     final Alliance nextMovement = this.board.getNextAllianceMovement();
     return new Board(pieces, nextMovement);
+  }
+  
+  @Override
+  String toString() {
+    return "MM:"+this.movedPiece.pieceType+"."+this.movedPiece.pieceId+"->"+this.destinationCoordinate+":-";
+  }
+  
+  @Override
+  boolean equals(Object other) {
+    if(!(other instanceof MajorMove))
+      return false;
+    MajorMove ptr = (MajorMove) other;
+    return ptr.toString().equals(this.toString());
   }
 }
 
@@ -41,6 +56,8 @@ class AttackMove extends Move {
   
   @Override
   Board execute() {
+    if(!this.board.getActualLegalMoves().contains(this))
+      return this.board;
     final short startId = this.movedPiece.pieceId;
     final short endId = coordinateToId(this.destinationCoordinate);
     final ArrayList<Piece> pieces = new ArrayList<Piece>();
@@ -57,35 +74,49 @@ class AttackMove extends Move {
     final Alliance nextMovement = this.board.getNextAllianceMovement();
     return new Board(pieces, nextMovement);
   }
-}
 
-ArrayList<Move> flightMoves(final Board board, final Piece pieceMoved) {
-  final Coordinate[] CANDIDATE_MOVE_COORDINATES = {
-                       new Coordinate((byte)  7, (byte)  2), new Coordinate((byte)  5, (byte)  6), new Coordinate((byte)  2, (byte)  8),
-                       new Coordinate((byte) -2, (byte)  8), new Coordinate((byte) -5, (byte)  6), new Coordinate((byte) -7, (byte)  2),
-                       new Coordinate((byte) -7, (byte) -2), new Coordinate((byte) -5, (byte) -6), new Coordinate((byte) -2, (byte) -8),
-                       new Coordinate((byte)  2, (byte) -8), new Coordinate((byte)  5, (byte) -6), new Coordinate((byte)  7, (byte) -2)
-                     };
-  final ArrayList<Move> legalMoves = new ArrayList<Move>();
-  for(Coordinate currentCandidate: CANDIDATE_MOVE_COORDINATES) {
-    final Coordinate candidateDestinationCoordinate = new Coordinate((byte) (EMPTY_TILES_CACHE[pieceMoved.pieceId].tileCoordinate.x + currentCandidate.x), (byte) (EMPTY_TILES_CACHE[pieceMoved.pieceId].tileCoordinate.y + currentCandidate.y));
-    if(coordinateToId(candidateDestinationCoordinate) == -1)
-      continue;
-    final Tile candidateDestinationTile = board.getTile(candidateDestinationCoordinate);
-    if(!candidateDestinationTile.isTileOccupied()) {
-      legalMoves.add(new MajorMove(board, pieceMoved, candidateDestinationCoordinate));
-    } else {
-      final Piece pieceDestination = candidateDestinationTile.getPiece();
-      final Alliance pieceAlliance = pieceDestination.pieceAlliance;
-      if(pieceMoved.pieceAlliance != pieceAlliance) {
-        legalMoves.add(new AttackMove(board, pieceMoved, candidateDestinationCoordinate, pieceDestination));
-      }
-    }
+  @Override
+  String toString() {
+    return "AM:"+this.movedPiece.pieceType+"."+this.movedPiece.pieceId+"->"+this.destinationCoordinate+":"+this.attackedPiece.pieceType;
   }
-  return legalMoves;
+  
+  @Override
+  boolean equals(Object other) {
+    if(!(other instanceof AttackMove))
+      return false;
+    AttackMove ptr = (AttackMove) other;
+    return ptr.toString().equals(this.toString());
+  }
 }
 
-ArrayList<Move> surfaceMoves(final Board board, final Piece pieceMoved, final Coordinate[] vectorMove, final boolean infiniteMoves) {
+class ProtectMove extends Move {
+  final Piece protectPiece;
+  
+  ProtectMove(final Board board, final Piece movedPiece, final Coordinate destinationCoordinate, final Piece protectPiece) {
+    super(board, movedPiece, destinationCoordinate);
+    this.protectPiece = protectPiece;
+  }
+  
+  @Override
+  Board execute() {
+    return this.board;
+  }
+
+  @Override
+  String toString() {
+    return "PM:"+this.movedPiece.pieceType+"."+this.movedPiece.pieceId+"~"+this.destinationCoordinate+":"+this.protectPiece.pieceType;
+  }
+  
+  @Override
+  boolean equals(Object other) {
+    if(!(other instanceof ProtectMove))
+      return false;
+    ProtectMove ptr = (ProtectMove) other;
+    return ptr.toString().equals(this.toString());
+  }
+}
+
+ArrayList<Move> calculateAllMoves(final Board board, final Piece pieceMoved, final Coordinate[] vectorMove, final boolean infiniteMoves) {
   final ArrayList<Move> legalMoves = new ArrayList<Move>();
   for(Coordinate candidateCoordinateOffset: vectorMove) {
     Coordinate candidateDestinationCoordinate = new Coordinate((byte) (EMPTY_TILES_CACHE[pieceMoved.pieceId].tileCoordinate.x + candidateCoordinateOffset.x), (byte) (EMPTY_TILES_CACHE[pieceMoved.pieceId].tileCoordinate.y + candidateCoordinateOffset.y));
@@ -98,6 +129,8 @@ ArrayList<Move> surfaceMoves(final Board board, final Piece pieceMoved, final Co
         final Alliance pieceAlliance = pieceDestination.pieceAlliance;
         if(pieceMoved.pieceAlliance != pieceAlliance) {
           legalMoves.add(new AttackMove(board, pieceMoved, candidateDestinationCoordinate, pieceDestination));
+        } else {
+          legalMoves.add(new ProtectMove(board, pieceMoved, candidateDestinationCoordinate, pieceDestination));
         }
       }
       if(!infiniteMoves)
@@ -113,7 +146,17 @@ ArrayList<Move> fixedMoves(final Board board, final Piece pieceMoved, final bool
                      fixedMoves[0] = pieceMoved.pieceAlliance.getMoveDirection();
                      fixedMoves[1] = pieceMoved.pieceAlliance.getAttackDirection()[0];
                      fixedMoves[2] = pieceMoved.pieceAlliance.getAttackDirection()[1];
-  return surfaceMoves(board, pieceMoved, fixedMoves, infiniteMoves);
+  return calculateAllMoves(board, pieceMoved, fixedMoves, infiniteMoves);
+}
+
+ArrayList<Move> flightMoves(final Board board, final Piece pieceMoved, final boolean infiniteMoves) {
+  final Coordinate[] flightMoves = {
+                       new Coordinate((byte)  7, (byte)  2), new Coordinate((byte)  5, (byte)  6), new Coordinate((byte)  2, (byte)  8),
+                       new Coordinate((byte) -2, (byte)  8), new Coordinate((byte) -5, (byte)  6), new Coordinate((byte) -7, (byte)  2),
+                       new Coordinate((byte) -7, (byte) -2), new Coordinate((byte) -5, (byte) -6), new Coordinate((byte) -2, (byte) -8),
+                       new Coordinate((byte)  2, (byte) -8), new Coordinate((byte)  5, (byte) -6), new Coordinate((byte)  7, (byte) -2)
+                     };
+  return calculateAllMoves(board, pieceMoved, flightMoves, infiniteMoves);
 }
 
 ArrayList<Move> diagonalMoves(final Board board, final Piece pieceMoved, final boolean infiniteMoves) {
@@ -121,7 +164,7 @@ ArrayList<Move> diagonalMoves(final Board board, final Piece pieceMoved, final b
                        new Coordinate((byte)  4, (byte) 0), new Coordinate((byte)  2, (byte)  4), new Coordinate((byte) -2, (byte)  4),
                        new Coordinate((byte) -4, (byte) 0), new Coordinate((byte) -2, (byte) -4), new Coordinate((byte)  2, (byte) -4)
                      };
-  return surfaceMoves(board, pieceMoved, diagonalVectorMoves, infiniteMoves);
+  return calculateAllMoves(board, pieceMoved, diagonalVectorMoves, infiniteMoves);
 }
 
 ArrayList<Move> straightMoves(final Board board, final Piece pieceMoved, final boolean infiniteMoves) {
@@ -129,5 +172,5 @@ ArrayList<Move> straightMoves(final Board board, final Piece pieceMoved, final b
                        new Coordinate((byte)  3, (byte)  2), new Coordinate((byte) 0, (byte)  4), new Coordinate((byte) -3, (byte)  2),
                        new Coordinate((byte) -3, (byte) -2), new Coordinate((byte) 0, (byte) -4), new Coordinate((byte)  3, (byte) -2)
                      };
-  return surfaceMoves(board, pieceMoved, straightVectorMoves, infiniteMoves);
+  return calculateAllMoves(board, pieceMoved, straightVectorMoves, infiniteMoves);
 }

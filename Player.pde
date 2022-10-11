@@ -26,6 +26,14 @@ class Player {
   ArrayList<Move> getAllMoves() {
     final ArrayList<Move> moves = new ArrayList<Move>();
     for(final Piece piece: this.playerPieces) {
+      moves.addAll(piece.calculateAllMoves(this.board));
+    }
+    return moves;
+  }
+  
+  ArrayList<Move> getLegalMoves() {
+    final ArrayList<Move> moves = new ArrayList<Move>();
+    for(final Piece piece: this.playerPieces) {
       moves.addAll(piece.calculateLegalMoves(this.board));
     }
     return moves;
