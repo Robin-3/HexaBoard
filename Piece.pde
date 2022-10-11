@@ -1,34 +1,34 @@
 enum Alliance {
   NO((byte) 0) {
-    @Override Coordinate getMoveDirection() {return new Coordinate((byte) -3, (byte) -2);}
-    @Override Coordinate[] getAttackDirection() {return new Coordinate[] {new Coordinate((byte) -4, (byte)  0), new Coordinate((byte) -2, (byte) -4)};}
+    @Override Coordinate getAttackDirection() {return new Coordinate((byte) -3, (byte) -2);}
+    @Override Coordinate[] getMajorDirection() {return new Coordinate[] {new Coordinate((byte) -4, (byte)  0), new Coordinate((byte) -2, (byte) -4)};}
   },
   PA((byte) 1) {
-    @Override Coordinate getMoveDirection() {return new Coordinate((byte)  0, (byte) -4);}
-    @Override Coordinate[] getAttackDirection() {return new Coordinate[] {new Coordinate((byte) -2, (byte) -4), new Coordinate((byte)  2, (byte) -4)};}
+    @Override Coordinate getAttackDirection() {return new Coordinate((byte)  0, (byte) -4);}
+    @Override Coordinate[] getMajorDirection() {return new Coordinate[] {new Coordinate((byte) -2, (byte) -4), new Coordinate((byte)  2, (byte) -4)};}
   },
   RE((byte) 2) {
-    @Override Coordinate getMoveDirection() {return new Coordinate((byte)  3, (byte) -2);}
-    @Override Coordinate[] getAttackDirection() {return new Coordinate[] {new Coordinate((byte)  2, (byte) -4), new Coordinate((byte)  4, (byte)  0)};}
+    @Override Coordinate getAttackDirection() {return new Coordinate((byte)  3, (byte) -2);}
+    @Override Coordinate[] getMajorDirection() {return new Coordinate[] {new Coordinate((byte)  2, (byte) -4), new Coordinate((byte)  4, (byte)  0)};}
   },
   CI((byte) 3) {
-    @Override Coordinate getMoveDirection() {return new Coordinate((byte)  3, (byte)  2);}
-    @Override Coordinate[] getAttackDirection() {return new Coordinate[] {new Coordinate((byte)  4, (byte)  0), new Coordinate((byte)  2, (byte)  4)};}
+    @Override Coordinate getAttackDirection() {return new Coordinate((byte)  3, (byte)  2);}
+    @Override Coordinate[] getMajorDirection() {return new Coordinate[] {new Coordinate((byte)  4, (byte)  0), new Coordinate((byte)  2, (byte)  4)};}
   },
   VO((byte) 4) {
-    @Override Coordinate getMoveDirection() {return new Coordinate((byte)  0, (byte)  4);}
-    @Override Coordinate[] getAttackDirection() {return new Coordinate[] {new Coordinate((byte)  2, (byte)  4), new Coordinate((byte) -2, (byte)  4)};}
+    @Override Coordinate getAttackDirection() {return new Coordinate((byte)  0, (byte)  4);}
+    @Override Coordinate[] getMajorDirection() {return new Coordinate[] {new Coordinate((byte)  2, (byte)  4), new Coordinate((byte) -2, (byte)  4)};}
   },
   MU((byte) 5) {
-    @Override Coordinate getMoveDirection() {return new Coordinate((byte) -3, (byte)  2);}
-    @Override Coordinate[] getAttackDirection() {return new Coordinate[] {new Coordinate((byte) -2, (byte) 4), new Coordinate((byte) -4, (byte) 0)};}
+    @Override Coordinate getAttackDirection() {return new Coordinate((byte) -3, (byte)  2);}
+    @Override Coordinate[] getMajorDirection() {return new Coordinate[] {new Coordinate((byte) -2, (byte) 4), new Coordinate((byte) -4, (byte) 0)};}
   };
   
   byte allianceName;
   Alliance(final byte allianceName) {this.allianceName = allianceName;}
   @Override String toString() {return ""+this.allianceName;}
-  abstract Coordinate getMoveDirection();
-  abstract Coordinate[] getAttackDirection();
+  abstract Coordinate getAttackDirection();
+  abstract Coordinate[] getMajorDirection();
 }
 
 enum PieceType {
@@ -121,14 +121,6 @@ class Elf extends Piece {
   @Override
   ArrayList<Move> calculateLegalMoves(final Board board) {
     return this.calculateAllMoves(board);
-    //final ArrayList<Move> allMoves = this.calculateAllMoves(board);
-    //for(int i = allMoves.size()-1;  i >= 0; i--) {
-    //  println(allMoves.get(i));
-    //  if(allMoves.get(i).getClass().getSimpleName().equals("MajorMove")) {
-    //    allMoves.remove(i);
-    //  }
-    //}
-    //return allMoves;
   }
 }
 

@@ -116,11 +116,18 @@ class ProtectMove extends Move {
   }
 }
 
-ArrayList<Move> calculateAllMoves(final Board board, final Piece pieceMoved, final Coordinate[] vectorMove, final boolean infiniteMoves) {
+ArrayList<Move> calculateAllMoves(final Board board, final Piece pieceMoved, final Coordinate[] vectorMove, final boolean infiniteMoves, final boolean isDiagonal) {
   final ArrayList<Move> legalMoves = new ArrayList<Move>();
   for(Coordinate candidateCoordinateOffset: vectorMove) {
     Coordinate candidateDestinationCoordinate = new Coordinate((byte) (EMPTY_TILES_CACHE[pieceMoved.pieceId].tileCoordinate.x + candidateCoordinateOffset.x), (byte) (EMPTY_TILES_CACHE[pieceMoved.pieceId].tileCoordinate.y + candidateCoordinateOffset.y));
     while(coordinateToId(candidateDestinationCoordinate) != -1) {
+      if(isDiagonal) {
+        final Coordinate diagonalDestinationCoordinate = new Coordinate((byte) (candidateDestinationCoordinate.x - candidateCoordinateOffset.x/2), (byte) (candidateDestinationCoordinate.y - candidateCoordinateOffset.y/2));
+        final Tile diagonalDestinationTile = board.getTile(diagonalDestinationCoordinate);
+        if(diagonalDestinationTile.isTileOccupied()) {
+          break;
+        }
+      }
       final Tile candidateDestinationTile = board.getTile(candidateDestinationCoordinate);
       if(!candidateDestinationTile.isTileOccupied()) {
         legalMoves.add(new MajorMove(board, pieceMoved, candidateDestinationCoordinate));
@@ -129,8 +136,10 @@ ArrayList<Move> calculateAllMoves(final Board board, final Piece pieceMoved, fin
         final Alliance pieceAlliance = pieceDestination.pieceAlliance;
         if(pieceMoved.pieceAlliance != pieceAlliance) {
           legalMoves.add(new AttackMove(board, pieceMoved, candidateDestinationCoordinate, pieceDestination));
+          break;
         } else {
           legalMoves.add(new ProtectMove(board, pieceMoved, candidateDestinationCoordinate, pieceDestination));
+          break;
         }
       }
       if(!infiniteMoves)
@@ -142,11 +151,17 @@ ArrayList<Move> calculateAllMoves(final Board board, final Piece pieceMoved, fin
 }
 
 ArrayList<Move> fixedMoves(final Board board, final Piece pieceMoved, final boolean infiniteMoves) {
-  final Coordinate[] fixedMoves = new Coordinate[3];
-                     fixedMoves[0] = pieceMoved.pieceAlliance.getMoveDirection();
-                     fixedMoves[1] = pieceMoved.pieceAlliance.getAttackDirection()[0];
-                     fixedMoves[2] = pieceMoved.pieceAlliance.getAttackDirection()[1];
-  return calculateAllMoves(board, pieceMoved, fixedMoves, infiniteMoves);
+  final ArrayList<Move> moves = new ArrayList<Move>();
+  final Coordinate[] attackMove = new Coordinate[] {pieceMoved.pieceAlliance.getAttackDirection()};
+  final Coordinate[] majorMoves = pieceMoved.pieceAlliance.getMajorDirection();
+  moves.addAll(calculateAllMoves(board, pieceMoved, attackMove, infiniteMoves, false));
+  for(int i = moves.size()-1;  i >= 0; i--) {
+    if(moves.get(i).getClass().getSimpleName().equals("MajorMove")) {
+      moves.remove(i);
+    }
+  }
+  moves.addAll(calculateAllMoves(board, pieceMoved, majorMoves, infiniteMoves, true));
+  return moves;
 }
 
 ArrayList<Move> flightMoves(final Board board, final Piece pieceMoved, final boolean infiniteMoves) {
@@ -156,7 +171,7 @@ ArrayList<Move> flightMoves(final Board board, final Piece pieceMoved, final boo
                        new Coordinate((byte) -7, (byte) -2), new Coordinate((byte) -5, (byte) -6), new Coordinate((byte) -2, (byte) -8),
                        new Coordinate((byte)  2, (byte) -8), new Coordinate((byte)  5, (byte) -6), new Coordinate((byte)  7, (byte) -2)
                      };
-  return calculateAllMoves(board, pieceMoved, flightMoves, infiniteMoves);
+  return calculateAllMoves(board, pieceMoved, flightMoves, infiniteMoves, false);
 }
 
 ArrayList<Move> diagonalMoves(final Board board, final Piece pieceMoved, final boolean infiniteMoves) {
@@ -164,7 +179,7 @@ ArrayList<Move> diagonalMoves(final Board board, final Piece pieceMoved, final b
                        new Coordinate((byte)  4, (byte) 0), new Coordinate((byte)  2, (byte)  4), new Coordinate((byte) -2, (byte)  4),
                        new Coordinate((byte) -4, (byte) 0), new Coordinate((byte) -2, (byte) -4), new Coordinate((byte)  2, (byte) -4)
                      };
-  return calculateAllMoves(board, pieceMoved, diagonalVectorMoves, infiniteMoves);
+  return calculateAllMoves(board, pieceMoved, diagonalVectorMoves, infiniteMoves, true);
 }
 
 ArrayList<Move> straightMoves(final Board board, final Piece pieceMoved, final boolean infiniteMoves) {
@@ -172,5 +187,5 @@ ArrayList<Move> straightMoves(final Board board, final Piece pieceMoved, final b
                        new Coordinate((byte)  3, (byte)  2), new Coordinate((byte) 0, (byte)  4), new Coordinate((byte) -3, (byte)  2),
                        new Coordinate((byte) -3, (byte) -2), new Coordinate((byte) 0, (byte) -4), new Coordinate((byte)  3, (byte) -2)
                      };
-  return calculateAllMoves(board, pieceMoved, straightVectorMoves, infiniteMoves);
+  return calculateAllMoves(board, pieceMoved, straightVectorMoves, infiniteMoves, false);
 }
