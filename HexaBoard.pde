@@ -1,13 +1,15 @@
 final byte SIZE = 9,
-           edges = 6;
-short cursorSelection = coordinateToId(new Coordinate((byte) 0, (byte) 0));
-short selectedTile = -1;
+           edges = 6,
+           pieceEdges = 5;
+short cursorSelection = coordinateToId(new Coordinate((byte) 0, (byte) 0)),
+      selectedTile = -1;
 final EmptyTile[] EMPTY_TILES_CACHE = createAllPossibleEmptyTiles();
 Board standardBoard = formation2players();
 ArrayList<Move> moves = standardBoard.getActualAllMoves();
 PImage boardImage;
 PGraphics pieceText;
 final byte iSize = SIZE*2-1;
+final float piecePaddingPercentaje = 0.9;
 float h, w;
 final HashMap<String, Integer> boardColors = loadBoardColors();
 

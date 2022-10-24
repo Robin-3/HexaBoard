@@ -59,7 +59,8 @@ Board loadBoard(final String board) {
     final Piece pieceType = codeToPiece(pieceData[1].charAt(0), pieceId, pieceAlliance);
     pieces.add(pieceType);
   }
-  return new Board(pieces, boardAllianceMovement);
+  Piece[] capturePieces = new Piece[] {new Assasin((short) -1, Alliance.PA)};
+  return new Board(pieces, capturePieces, boardAllianceMovement);
 }
 
 Alliance codeToAlliance(final byte code) {

@@ -1,10 +1,11 @@
 class Board {
   final Tile[] gameBoard;
+  final Piece[] capturePieces;
   final Alliance[] alliancePieces;
   final Player[] players;
   byte allianceMovement;
   
-  Board(final ArrayList<Piece> pieces, Alliance allianceTurn) {
+  Board(final ArrayList<Piece> pieces, final Piece[] capturePieces, final Alliance allianceTurn) {
     this.gameBoard = new Tile[EMPTY_TILES_CACHE.length];
     for(int i = 0; i < this.gameBoard.length; i++) {
       this.gameBoard[i] = new EmptyTile(EMPTY_TILES_CACHE[i].tileId, EMPTY_TILES_CACHE[i].tileCoordinate);
@@ -34,6 +35,7 @@ class Board {
         break;
       }
     }
+    this.capturePieces = capturePieces;
     if(!exist) throw new IllegalArgumentException("Piece alliance "+allianceTurn+" does not participate in this game.");
     players = new Player[alliances.length];
     for(byte i = 0; i < players.length; i++) {

@@ -57,10 +57,11 @@ void drawPieces() {
       stroke(boardColors.get("piece"+pieceAlliance+"Stroke"));
       beginShape();
       final float x = w*(abs(offsetW)/2.0 + j + 0.5);
-      for (byte k = 0; k < edges; k++) {
-        final float theta = PI*(4.0*k+edges)/(2.0*edges),
-                    xVertex = w*sqrt(3)*cos(theta)/3.0+x,
-                    yVertex = h*sqrt(3)*sin(theta)/3.0+y;
+      final float allianceRotation = tile.getPiece().pieceAlliance.allianceName;
+      for (byte k = 0; k < pieceEdges; k++) {
+        final float theta = 2*PI*(k/(pieceEdges+0.0)+allianceRotation/edges)-6*PI/180, // fix this magic number
+                    xVertex = w*sqrt(3)*cos(theta)*piecePaddingPercentaje/3.0+x,
+                    yVertex = h*sqrt(3)*sin(theta)*piecePaddingPercentaje/3.0+y;
         vertex(xVertex, yVertex);
       }
       endShape(CLOSE);

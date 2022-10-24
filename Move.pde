@@ -29,7 +29,7 @@ class MajorMove extends Move {
     final Piece moved = codeToPiece(this.movedPiece.pieceType.toString().charAt(0), coordinateToId(this.destinationCoordinate), this.movedPiece.pieceAlliance);
     pieces.add(moved);
     final Alliance nextMovement = this.board.getNextAllianceMovement();
-    return new Board(pieces, nextMovement);
+    return new Board(pieces, this.board.capturePieces, nextMovement);
   }
   
   @Override
@@ -72,7 +72,7 @@ class AttackMove extends Move {
     final Piece moved = codeToPiece(this.movedPiece.pieceType.toString().charAt(0), coordinateToId(this.destinationCoordinate), this.movedPiece.pieceAlliance);
     pieces.add(moved);
     final Alliance nextMovement = this.board.getNextAllianceMovement();
-    return new Board(pieces, nextMovement);
+    return new Board(pieces, this.board.capturePieces, nextMovement);
   }
 
   @Override
