@@ -56,8 +56,17 @@ abstract class Piece {
     this.pieceType = pieceType;
   }
   
+  ArrayList<Move> calculateLegalMoves(final Board board) {
+    final ArrayList<Move> moves = this.calculateAllMoves(board);
+    for(int i = moves.size()-1;  i >= 0; i--) {
+      if(moves.get(i).getClass().getSimpleName().equals("ProtectMove")) {
+        moves.remove(i);
+      }
+    }
+    return moves;
+  }
+  
   abstract ArrayList<Move> calculateAllMoves(final Board board);
-  abstract ArrayList<Move> calculateLegalMoves(final Board board);
 }
 
 class Assasin extends Piece {
@@ -68,11 +77,6 @@ class Assasin extends Piece {
   @Override
   ArrayList<Move> calculateAllMoves(final Board board) {
     return fixedMoves(board, this, false);
-  }
-  
-  @Override
-  ArrayList<Move> calculateLegalMoves(final Board board) {
-    return this.calculateAllMoves(board);
   }
 }
 
@@ -85,11 +89,6 @@ class Dragon extends Piece {
   ArrayList<Move> calculateAllMoves(final Board board) {
     return flightMoves(board, this, false);
   }
-  
-  @Override
-  ArrayList<Move> calculateLegalMoves(final Board board) {
-    return this.calculateAllMoves(board);
-  }
 }
 
 class Wizard extends Piece {
@@ -100,11 +99,6 @@ class Wizard extends Piece {
   @Override
   ArrayList<Move> calculateAllMoves(final Board board) {
     return diagonalMoves(board, this, true);
-  }
-  
-  @Override
-  ArrayList<Move> calculateLegalMoves(final Board board) {
-    return this.calculateAllMoves(board);
   }
 }
 
@@ -117,11 +111,6 @@ class Elf extends Piece {
   ArrayList<Move> calculateAllMoves(final Board board) {
     return straightMoves(board, this, true);
   }
-  
-  @Override
-  ArrayList<Move> calculateLegalMoves(final Board board) {
-    return this.calculateAllMoves(board);
-  }
 }
 
 class Mimic extends Piece {
@@ -131,15 +120,10 @@ class Mimic extends Piece {
   
   @Override
   ArrayList<Move> calculateAllMoves(final Board board) {
-    final ArrayList<Move> legalMoves = new ArrayList<Move>();
-    legalMoves.addAll(diagonalMoves(board, this, false));
-    legalMoves.addAll(straightMoves(board, this, false));
-    return legalMoves;
-  }
-  
-  @Override
-  ArrayList<Move> calculateLegalMoves(final Board board) {
-    return this.calculateAllMoves(board);
+    final ArrayList<Move> moves = new ArrayList<Move>();
+    moves.addAll(diagonalMoves(board, this, false));
+    moves.addAll(straightMoves(board, this, false));
+    return moves;
   }
 }
 
@@ -154,16 +138,11 @@ class Ghost extends Piece {
   
   @Override
   ArrayList<Move> calculateAllMoves(final Board board) {
-    final ArrayList<Move> legalMoves = new ArrayList<Move>();
-    legalMoves.addAll(diagonalMoves(board, this, false));
-    legalMoves.addAll(straightMoves(board, this, false));
-    legalMoves.addAll(flightMoves(board, this, false));
-    return legalMoves;
-  }
-  
-  @Override
-  ArrayList<Move> calculateLegalMoves(final Board board) {
-    return this.calculateAllMoves(board);
+    final ArrayList<Move> moves = new ArrayList<Move>();
+    moves.addAll(diagonalMoves(board, this, false));
+    moves.addAll(straightMoves(board, this, false));
+    moves.addAll(flightMoves(board, this, false));
+    return moves;
   }
 }
 
@@ -174,14 +153,9 @@ class Doppelganger extends Ghost {
   
   @Override
   ArrayList<Move> calculateAllMoves(final Board board) {
-    final ArrayList<Move> legalMoves = new ArrayList<Move>();
-    legalMoves.addAll(diagonalMoves(board, this, true));
-    legalMoves.addAll(straightMoves(board, this, true));
-    return legalMoves;
-  }
-  
-  @Override
-  ArrayList<Move> calculateLegalMoves(final Board board) {
-    return this.calculateAllMoves(board);
+    final ArrayList<Move> moves = new ArrayList<Move>();
+    moves.addAll(diagonalMoves(board, this, true));
+    moves.addAll(straightMoves(board, this, true));
+    return moves;
   }
 }

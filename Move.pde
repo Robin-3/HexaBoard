@@ -99,7 +99,7 @@ class ProtectMove extends Move {
   
   @Override
   Board execute() {
-    return this.board;
+    throw new IllegalArgumentException("Piece cannot move in the same Tile with same Alliance.");
   }
 
   @Override

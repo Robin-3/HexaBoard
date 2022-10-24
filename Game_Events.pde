@@ -32,12 +32,9 @@ void selectTile() {
 }
 
 void generateRandomMove() {
-  int randomIndexMove = floor(random(moves.size()));
-  Move move = moves.get(randomIndexMove);
-  while(move.getClass().getSimpleName().equals("ProtectMove")) {
-    randomIndexMove = floor(random(moves.size()));
-    move = moves.get(randomIndexMove);
-  }
+  final ArrayList<Move> legalMoves = standardBoard.getActualLegalMoves();
+  final int randomIndexMove = floor(random(legalMoves.size()));
+  final Move move = legalMoves.get(randomIndexMove);
   final Coordinate cursorDestination = move.destinationCoordinate;
   standardBoard = move.execute();
   moves = standardBoard.getActualAllMoves();
