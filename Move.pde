@@ -151,16 +151,23 @@ ArrayList<Move> calculateAllMoves(final Board board, final Piece pieceMoved, fin
 }
 
 ArrayList<Move> fixedMoves(final Board board, final Piece pieceMoved, final boolean infiniteMoves) {
+  final ArrayList<Move> attackMoves = new ArrayList<Move>();
+  final Coordinate[] attackMove = pieceMoved.pieceAlliance.getAttackDirection();
+  attackMoves.addAll(calculateAllMoves(board, pieceMoved, attackMove, infiniteMoves, false));
+  for(int i = attackMoves.size()-1;  i >= 0; i--) {
+    if(attackMoves.get(i).getClass().getSimpleName().equals("MajorMove")) {
+      attackMoves.remove(i);
+    }
+  }
   final ArrayList<Move> moves = new ArrayList<Move>();
-  final Coordinate[] attackMove = new Coordinate[] {pieceMoved.pieceAlliance.getAttackDirection()};
   final Coordinate[] majorMoves = pieceMoved.pieceAlliance.getMajorDirection();
-  moves.addAll(calculateAllMoves(board, pieceMoved, attackMove, infiniteMoves, false));
+  moves.addAll(calculateAllMoves(board, pieceMoved, majorMoves, infiniteMoves, true));
   for(int i = moves.size()-1;  i >= 0; i--) {
-    if(moves.get(i).getClass().getSimpleName().equals("MajorMove")) {
+    if(!moves.get(i).getClass().getSimpleName().equals("MajorMove")) {
       moves.remove(i);
     }
   }
-  moves.addAll(calculateAllMoves(board, pieceMoved, majorMoves, infiniteMoves, true));
+  moves.addAll(attackMoves);
   return moves;
 }
 
