@@ -1,40 +1,47 @@
 // ========== EXECUTION ==========
 s = 1.15;
 r = 0.12;
-h = 0.5;
+h = .5;
 mid = 0.4;
-pin = 0.5;
+pin = 0.6;
 size = 100;
-i = 0;
-
+i = 8;
 
 // ========== SETUP ==========
 // Set up variables
-sq3 = sqrt(3);
-x = sqrt(3*sq3/2);
-y = sq3/2 * sqrt(2*sq3 - 3);
-
+side = sqrt(6*sqrt(3));
 // Set up vertices
-M = [0, 0];
-G = [sq3, 0];       B = [-sq3, 0];
-N = [-sq3/2, 0.5];  L = [sq3/2, -0.5];
-O = N + [0, 1];     K = L - [0, 1];
-E = [y, 1.5];       J = [-y, -1.5];
-C = E + [-sq3, 0];  H = J + [sq3, 0];
-D = E + [-1.5, y];  I = J + [1.5, -y];
-F = E + [1.5, -y];  A = J + [-1.5, y];
+P = [0,0];
+H = [1/2*side, sqrt(6*sqrt(3)-9)/6*side];
+O = [(sqrt(2*sqrt(3)-3)+3)/12*side, -(sqrt(3)-sqrt(6*sqrt(3)-9))/12*side];
+N = [(1+sqrt(2*sqrt(3)-3))/4*side, (sqrt(6*sqrt(3)-9)+3*sqrt(7-4*sqrt(3))-6)/12*side];
+F = [P[0], H[0]];
+J = [H[0], H[1]-F[1]];
+K = [H[0], -F[1]];
+G = [H[0], F[1]];
+I = [H[0], (3-2*sqrt(6*sqrt(3)-9))/6*side];
+M = [(sqrt(2*sqrt(3))-sqrt(12-6*sqrt(3)))/4*side, (sqrt(4-2*sqrt(3))-sqrt(14*sqrt(3)-24)-2)/4*side];
+B = -H;
+Q = -O;
+R = -N;
+L = -F;
+D = -J;
+E = -K;
+A = -G;
+C = -I;
+S = -M;
 
 // Set up shapes
 shape = [
-    [ [A,B,N,M,J], [A,B,J] ],
-    [ [B,C,O,N], [B,O,G+[-3,2*y],2*B-A] ],
-    [ [O,E,M,N], [O,E] ],
-    [ [C,D,E], [E,D,O,C+[2*y,0]] ],
-    [ [F,G,L,M,E], [F,G,E] ],
-    [ [G,H,K,L], [G,K,B+[3,-2*y],2*G-F] ],
-    [ [K,J,M,L], [K,J] ],
-    [ [H,I,J], [J,I,K,H-[2*y,0]] ]
-  ];
+    [ [A,B,Q,P,L], [A,B,L] ],
+    [ [B,D,R,Q],   [B,R,[-H[0],H[1]],C] ],
+    [ [R,F,P,Q],   [R,F] ],
+    [ [D,E,F],     [F,E,R,S] ],
+    [ [G,H,O,P,F], [G,H,F] ],
+    [ [H,J,N,O],   [H,N,[-B[0],B[1]],I] ],
+    [ [N,L,P,O],   [N,L] ],
+    [ [J,K,L],     [L,K,N,M] ]
+];
 
 
 // ========== MODULES ==========
@@ -48,14 +55,14 @@ module mypoly(i, h) {
 module mycylinder(i, v, h, r, s=1, c=true) {
   translate(shape[i][1][v])
     scale([s, s, s])
-    cylinder(h=h, r=r, center=c, $fn=100);
+        cylinder(h=h, r=r, center=c, $fn=100);
 }
 
 // Makes the specified shape, with correct hinges/etc.
 module myshape(i) {
   difference() {
     union() {
-      mypoly(i,h); // Base shape
+      mypoly(i, h); // Base shape
       mycylinder(i, 0, h, r); // + 100% main in-hinge
       mycylinder(i, 1, h, r); // + 100% main out-hinge
     }
@@ -77,45 +84,37 @@ module myshape(i) {
   }
 
   mycylinder(i, 0, h, r*pin); // + 100% pin in-hinge
-
-  // Add keychain loop onto Shape 0
-  //if (i==0)
-  //  translate([-.8, -1, h/2+.09])
-  //    rotate([0, 90, 23])
-  //    rotate_extrude($fn=100)
-  //    translate([.14, 0, 0])
-  //    circle(.05);
 }
 
 // Make all shapes
 module makeAll(size) {
-  scale([size, size, size])
-    translate([0, 0, h/2]) {
-      translate([3, -2*y, 0]) {
-      //translate([0, 0, 0]) {
-        myshape(0);
-        myshape(1);
-        myshape(2);
-        myshape(3);
-      }
-
-      myshape(4);
-      myshape(5);
-      myshape(6);
-      myshape(7);
-    }
+    scale([size, size, size])
+        translate([0, 0, h/2]) {
+            translate([side/2,0,0]) {
+                myshape(0);
+                myshape(1);
+                myshape(2);
+                myshape(3);
+            }
+            translate([-side/2,0,0]) {
+                myshape(4);
+                myshape(5);
+                myshape(6);
+                myshape(7);
+            }
+        }
 }
 
 // Make specified shape
 module make(i, size) {
-  scale([size, size, size])
-    translate([0, 0, h/2])
-    myshape(i);
+    scale([size, size, size])
+        translate([0, 0, h/2])
+            myshape(i);
 }
 
 
 // ========== EXECUTION ==========
 if(i >= 0 && i <= 7)
-  make(i, size/(2*sq3));
+    make(i, size);
 else
-  makeAll(size/(2*sq3));
+    makeAll(size);

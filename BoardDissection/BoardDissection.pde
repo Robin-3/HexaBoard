@@ -1,44 +1,69 @@
-float size;
-final float sq3 = sqrt(3),
-            y = sq3/2*sqrt(2*sq3-3);
-final float[] M = {0,        0},
-              G = {sq3,      0},
-              B = {-sq3,     0},
-              N = {-sq3/2,   0.5},
-              L = {sq3/2,    -0.5},
-              O = {N[0]+0,   N[1]+1},
-              K = {L[0]-0,   L[1]-1},
-              E = {y,        1.5},
-              J = {-y,       -1.5},
-              C = {E[0]-sq3, E[1]+0},
-              H = {J[0]+sq3, J[1]+0},
-              D = {E[0]-1.5, E[1]+y},
-              I = {J[0]+1.5, J[1]-y},
-              F = {E[0]+1.5, E[1]-y},
-              A = {J[0]-1.5, J[1]+y};
+final int side = 600;
+
+final float[] P = {0,                                           0},
+              H = {1/2.0*side,                                  sqrt(6*sqrt(3)-9)/6*side},
+              O = {(sqrt(2*sqrt(3)-3)+3)/12*side,               -(sqrt(3)-sqrt(6*sqrt(3)-9))/12*side},
+              N = {(1+sqrt(2*sqrt(3)-3))/4*side,                (sqrt(6*sqrt(3)-9)+3*sqrt(7-4*sqrt(3))-6)/12*side},
+              F = {P[0],                                        H[0]},
+              J = {H[0],                                        H[1]-F[1]},
+              K = {H[0],                                        -F[1]},
+              G = {H[0],                                        F[1]},
+              
+              I = {H[0],                                        (3-2*sqrt(6*sqrt(3)-9))/6*side},
+              M = {(sqrt(2*sqrt(3))-sqrt(12-6*sqrt(3)))/4*side, (sqrt(4-2*sqrt(3))-sqrt(14*sqrt(3)-24)-2)/4*side},
+              
+              B = {-H[0],                                       -H[1]},
+              Q = {-O[0],                                       -O[1]},
+              R = {-N[0],                                       -N[1]},
+              L = {-F[0],                                       -F[1]},
+              D = {-J[0],                                       -J[1]},
+              E = {-K[0],                                       -K[1]},
+              A = {-G[0],                                       -G[1]},
+              
+              C = {-I[0],                                       -I[1]},
+              S = {-M[0],                                       -M[1]};
+
 final float[][][] shape = {
-    {A, B, N, M, J},
-    {B, C, O, N},
-    {O, E, M, N},
-    {C, D, E},
-    {F, G, L, M, E},
-    {G, H, K, L},
-    {K, J, M, L},
-    {H, I, J}
-  };
+  {A, B, Q, P, L},
+  {B, D, R, Q},
+  {R, F, P, Q},
+  {D, E, F},
+  {G, H, O, P, F},
+  {H, J, N, O},
+  {N, L, P, O},
+  {J, K, L}
+};
+
+final float[][][] bisagras = {
+  {A, B, L},
+  {B, R, {-H[0], H[1]}, C},
+  {R, F},
+  {F, E, R, S},
+  {G, H, F},
+  {H, N, {-B[0], B[1]}, I},
+  {N, L},
+  {L, K, N, M}
+};
 
 PGraphics pg;
 
 void setup() {
-  size(400, 400, P2D);
+  size(600, 600, P2D);
   //fullScreen(P2D);
-  size = height*.825;
-  pg = createGraphics(width, height, P2D);
+  pg = createGraphics(side, side, P2D);
   pg.beginDraw();
   pg.noFill();
   pg.stroke(0);
-  for(float[][] s: shape) {
-    polygon(s, size/(2*sq3));
+  pg.translate(side/2, side/2);
+  for(int i = 0; i < shape.length; i++) {
+    float[][] s = shape[i];
+    float x_offset = i<shape.length/2? side/2: -side/2;
+    polygon(s, x_offset);
+  }
+  for(int i = 0; i < bisagras.length; i++) {
+    float[][] s = bisagras[i];
+    float x_offset = i<bisagras.length/2? side/2: -side/2;
+    bisagra(s, x_offset);
   }
   //pg.save("dissection.png");
   pg.endDraw();
@@ -46,14 +71,29 @@ void setup() {
 }
 
 void draw() {
+  scale(1, -1);
+  translate(0, -height);
   background(255);
   image(pg, 0, 0);
 }
 
-void polygon(float[][] shape, float size) {
+void polygon(float[][] shape, float x_offset) {
   pg.beginShape();
   for(float[] s: shape) {
-    pg.vertex(s[0]*size+width/2, s[1]*size+height/2);
+    pg.vertex(s[0]+x_offset, s[1]);
   }
   pg.endShape(CLOSE);
+}
+
+void bisagra(float[][] shape, float x_offset) {
+  for(int i = 0; i < shape.length; i++) {
+    float[] s = shape[i];
+    if(i<2) {
+      pg.noFill();
+      pg.ellipse(s[0]+x_offset, s[1], side/10, side/10);
+    } else {
+      pg.fill(0, 0, 255, 50);
+      pg.ellipse(s[0]+x_offset, s[1], side/15, side/15);
+    }
+  }
 }
